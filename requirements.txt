@@ -1,0 +1,5 @@
+# Database connections
+psycopg2-binary==2.9.9
+
+# Data manipulation
+pandas==2.2.2

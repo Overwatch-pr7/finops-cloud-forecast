@@ -3,10 +3,16 @@ import pandas as pd
 from psycopg2.extras import execute_values
 import os
 
-# Neon Connection String
-NEON_CONN_STR = "postgresql://neondb_owner:npg_A1BnR7osUCSc@ep-cool-dream-b3f7plhb-pooler.c-4.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
+import streamlit as st
+
+# Load Neon Connection String from Streamlit Secrets
+NEON_CONN_STR = st.secrets.get("DATABASE_URL")
 
 def seed_database():
+    if not NEON_CONN_STR:
+        print("❌ Error: DATABASE_URL not found in .streamlit/secrets.toml")
+        return
+    
     try:
         print("Connecting to Neon Database...")
         conn = psycopg2.connect(NEON_CONN_STR)

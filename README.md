@@ -41,4 +41,3 @@ We migrated the application from a local Docker environment to a fully managed c
 
 ---
 
-*Inspired by the FinOps Foundation's Cloud Cost Forecasting guidelines: https://www.finops.org/wg/cloud-cost-forecasting/*

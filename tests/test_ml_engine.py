@@ -7,6 +7,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from backend.data_loader import get_prophet_dataframe
 from backend.ml_engine import generate_forecast
+from backend.finops_calc import calculate_finops_metrics
 
 def run_ml_test(days=60):
     print("Testing ML Engine with Meta Prophet...")
@@ -27,23 +28,33 @@ def run_ml_test(days=60):
         print("TEST FAILED: Forecasting returned None.")
         sys.exit(1)
         
-    # Step 3: Display results
+    # Step 3: Calculate FinOps Metrics
+    print("\nStep 3: Calculating FinOps Metrics (Wasted Spend vs Shortage)")
+    # We will pass only the future predictions (the last `days` rows) to the financial calculator
+    future_forecast = forecast.tail(days)
+    finops_results = calculate_finops_metrics(future_forecast, provisioned_limit=1000.0, price_per_unit=0.05)
+    
+    # Step 4: Display and Save Results
     print("\n" + "-" * 50)
-    print("TEST PASSED: Forecast generated successfully!")
-    print(f"\nLast 5 days of the {days}-day future forecast:")
+    print("TEST PASSED: Forecast and FinOps metrics generated successfully!")
     
-    # We select the most relevant columns to show the user
-    # 'ds' (Date), 'yhat' (Predicted value), 'yhat_lower' (Lower bound), 'yhat_upper' (Upper bound)
-    columns_to_show = ['ds', 'yhat', 'yhat_lower', 'yhat_upper']
+    # Define columns to save
+    prophet_columns = ['ds', 'yhat', 'yhat_lower', 'yhat_upper']
+    finops_columns = ['ds', 'yhat', 'provisioned_limit', 'delta', 'financial_impact']
     
-    # Output to CSV for the user to see the entire future forecast
-    output_file = f"forecast_output_{days}_days.csv"
-    future_forecast = forecast[columns_to_show].tail(days)
-    future_forecast.to_csv(output_file, index=False)
-    print(f"Saved the full {days}-day forecast to {output_file} so you can view all rows!")
+    # Output paths inside the data/ folder
+    base_forecast_file = "data/trend_forecast.csv"
+    delta_forecast_file = "data/trend_forecast_with_delta.csv"
     
-    print("\nPreview of the last 5 days:")
-    print(future_forecast.tail())
+    # Save the files
+    future_forecast[prophet_columns].to_csv(base_forecast_file, index=False)
+    finops_results[finops_columns].to_csv(delta_forecast_file, index=False)
+    
+    print(f"Saved the Prophet forecast to {base_forecast_file}")
+    print(f"Saved the FinOps forecast to {delta_forecast_file}")
+    
+    print("\nPreview of the last 5 days (FinOps Metrics):")
+    print(finops_results[finops_columns].tail())
     print("-" * 50)
 
 if __name__ == "__main__":

@@ -24,6 +24,8 @@ services:
     container_name: finops-ml-engine
     environment:
       - DB_HOST=db
+    ports:
+      - "8501:8501"
     volumes:
       - ./:/app
     depends_on:

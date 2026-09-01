@@ -2,4 +2,12 @@
 psycopg2-binary==2.9.9
 
 # Data manipulation
+numpy<2.0.0
+cython
+pystan
+prophet
 pandas==2.2.2
+
+# Dashboard and Visualization
+streamlit==1.38.0
+plotly==5.24.0

@@ -15,4 +15,8 @@ COPY . .
 # Set PYTHONPATH
 ENV PYTHONPATH=/app
 
-CMD ["python", "tests/test_ml_engine.py"]
+# Expose Streamlit's default port
+EXPOSE 8501
+
+# Run the Streamlit application
+CMD ["streamlit", "run", "app.py", "--server.address", "0.0.0.0"]

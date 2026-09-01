@@ -9,7 +9,8 @@ def get_prophet_dataframe(
     db_host=os.environ.get("DB_HOST", "localhost"), 
     db_port="5432", 
     db_name="finops_db",
-    target_metric="daily_cost_usd"
+    target_metric="daily_cost_usd",
+    connection_string=None
 ):
     """
     Connects to the PostgreSQL database, retrieves the cloud billing data,
@@ -29,13 +30,16 @@ def get_prophet_dataframe(
     
     # Establish connection to the PostgreSQL database
     try:
-        conn = psycopg2.connect(
-            user=db_user,
-            password=db_password,
-            host=db_host,
-            port=db_port,
-            database=db_name
-        )
+        if connection_string:
+            conn = psycopg2.connect(connection_string)
+        else:
+            conn = psycopg2.connect(
+                user=db_user,
+                password=db_password,
+                host=db_host,
+                port=db_port,
+                database=db_name
+            )
     except Exception as e:
         print(f"Error connecting to database: {e}")
         print("Please ensure Docker Desktop is running and you have started the database.")
